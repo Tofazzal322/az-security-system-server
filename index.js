@@ -5,15 +5,12 @@ const admin = require("firebase-admin");
 require("dotenv").config();//dotenv config
 const port = process.env.PORT || 5000;
 const ObjectId = require('mongodb').ObjectId;
+
 //Middleware
 app.use(cors());
 app.use(express.json());
 
 //////////////////////////// Mongodb Server Uri and Client ////////////////////////////
-
-// const uri = "mongodb+srv://<username>:<password>@cluster0.i6saz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
 const { MongoClient } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.i6saz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -45,7 +42,7 @@ async function run() {
       const reviewsCollection = database.collection("reviews");
       const ordersCollection = database.collection("orders");
 
- /////////////////////////////// Get Products From DataBase //////////
+ ////////////////////// Get Products From DataBase ////////////////////
       app.get("/products", async (req, res) => {
         const cursor = productsCollection.find({});
         const products = await cursor.toArray();
@@ -85,7 +82,7 @@ async function run() {
 //////////////////////////////////////////////////////////////////
       
       
-/////////////////// Get All Data From Database to Ui after verify token  /////////////////
+//////////// Get All Data From Database to Ui after verify token  //////////
       app.get('/products',verifyToken, async (req, res) => {
         const email = req.query.email;
         const date =new Date(req.query.date).toLocaleDateString();
@@ -94,10 +91,10 @@ async function run() {
         const products = await cursor.toArray()
         res.json(products);
       })
-/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
       
 
- ///////////////////// All Orders collection for admin ////////////////////////////
+ ///////////////////// All Orders collection for admin /////////////////////
       app.get("/orders", async (req, res) => {
        const cursor = ordersCollection.find({});
         const orders = await cursor.toArray();
@@ -109,7 +106,7 @@ async function run() {
 
 
       
-/////////////////////  Orders collection with email for user ///////////////////
+//////////////  Orders collection with email for user ///////////////////
       app.get("/orders/:email", async (req, res) => {
         // console.log(req.params.email);
         const email = req.query.email;
@@ -123,7 +120,7 @@ async function run() {
 
   
 
-/////////////////////// Post Products Data To database Api ////////////////
+/////////////// Post Products Data To database Api ////////////////
       app.post('/products', async (req, res) => {
         const productsData = req.body
         const result = await productsCollection.insertOne(productsData)
@@ -133,7 +130,7 @@ async function run() {
 ////////////////////////////////////////////////////////////////////
       
 
-/////////////////////// Post Reviews Data To database Api ////////////////
+//////////////// Post Reviews Data To database Api ////////////////
       
       app.post('/reviews', async (req, res) => {
         const reviewsData = req.body
@@ -230,7 +227,7 @@ async function run() {
 
       
 //////////////////////////  Service Account /////////////////////////////
-//  final-project2-firebase-adminsdk.json     
+    
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
