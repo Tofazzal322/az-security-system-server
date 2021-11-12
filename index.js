@@ -1,11 +1,10 @@
 const express = require('express');
 const cors = require('cors')//cors for own server connected with own
 const app = express();
-const ObjectId = require('mongodb').ObjectId;
 const admin = require("firebase-admin");
 require("dotenv").config();//dotenv config
 const port = process.env.PORT || 5000;
-
+const ObjectId = require('mongodb').ObjectId;
 //Middleware
 app.use(cors());
 app.use(express.json());
@@ -76,13 +75,13 @@ async function run() {
 
       
 ////////////////// GET Single product  /////////////////////////////////
-      // app.get("/products/:bookId", async (req, res) => {
-      //   const id = req.params.bookId;
-      //   console.log("getting specific product", id);
-      //   const query = { _id: ObjectId(id) };
-      //   const product = await productsCollection.findOne(query);
-      //   res.send(product);
-      // });
+      app.get("/orders/:bookId", async (req, res) => {
+        const id = req.params.bookId;
+        console.log("getting specific product for update", id);
+        const query = { _id: ObjectId(id) };
+        const orders = await ordersCollection.findOne(query);
+        res.send(orders);
+      });
 //////////////////////////////////////////////////////////////////
       
       
@@ -98,35 +97,38 @@ async function run() {
 /////////////////////////////////////////////////////////////////////
       
 
-
-      
-
-///////////////////// All Orders collection for admin ////////////////////////////
+ ///////////////////// All Orders collection for admin ////////////////////////////
       app.get("/orders", async (req, res) => {
        const cursor = ordersCollection.find({});
         const orders = await cursor.toArray();
         res.json(orders);
         console.log("object server connected to all orders");
       });
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////// 
+      
+
+
       
 /////////////////////  Orders collection with email for user ///////////////////
-      app.get("/orders:/email", async (req, res) => {
+      app.get("/orders/:email", async (req, res) => {
         // console.log(req.params.email);
         const email = req.query.email;
         const query = {email: email}
         const result = await ordersCollection.find(query).toArray()
         res.json(result);
+        console.log("connected to for single user");
       });
 //////////////////////////////////////////////////////////////////////
       
+
+  
 
 /////////////////////// Post Products Data To database Api ////////////////
       app.post('/products', async (req, res) => {
         const productsData = req.body
         const result = await productsCollection.insertOne(productsData)
              res.json(result)
-             console.log(result,"data connected from add products")
+             console.log("data connected from add products")
       })     
 ////////////////////////////////////////////////////////////////////
       
@@ -152,14 +154,40 @@ async function run() {
       })     
 ////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////
-      app.delete('/orders', async (req, res) => {
-  
-        res.send(' deleted connected')
-        console.log('deleted hitting to the server');
-})
       
 
+/////////////   Status  update API //////////////////////////////
+      app.put("/orders/:ordersId", async (req, res) => {
+        const id = req.params.ordersId;
+        const updateOrdersStatus = req.body;
+        const query = { _id: ObjectId(id) };
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: {
+            status: updateOrdersStatus.status,
+            email: updateOrdersStatus.email,
+          },
+        };
+        const result = await ordersCollection.updateOne(
+          query,
+          updateDoc,
+          options
+        );
+        res.json(result);
+      });
+///////////////////////////////////////////////////////////////////      
+      
+
+
+//////////////////// Cancel Orders request from ui  //////////////////
+      app.delete("/orders/:id", async (req, res) => {
+        const id = req.params.id;
+        console.log(req.params.id);
+        const query = {_id: ObjectId(id) };
+        const result = await ordersCollection.deleteOne(query);
+        res.json(result);
+        console.log("deleted hitting to the server");
+      });
 /////////////////////////////////////////////////////////////////
 
 /////////////////// Check Admin  //////////////////////////////////    
