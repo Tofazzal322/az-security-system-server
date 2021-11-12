@@ -46,7 +46,7 @@ async function run() {
       app.get("/products", async (req, res) => {
         const cursor = productsCollection.find({});
         const products = await cursor.toArray();
-        res.json(products);
+        res.send(products);
       });
 //////////////////////////////////////////////////////////////////////////
       
@@ -66,7 +66,7 @@ async function run() {
       app.get("/reviews", async (req, res) => {
         const cursor = reviewsCollection.find({});
         const reviews = await cursor.toArray();
-        res.json(reviews);
+        res.send(reviews);
       });
 //////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +89,7 @@ async function run() {
         const query = {email: email,date:date}
         const cursor = productsCollection.find(query);
         const products = await cursor.toArray()
-        res.json(products);
+        res.send(products);
       })
 /////////////////////////////////////////////////////////////////////////////
       
@@ -98,7 +98,7 @@ async function run() {
       app.get("/orders", async (req, res) => {
        const cursor = ordersCollection.find({});
         const orders = await cursor.toArray();
-        res.json(orders);
+        res.send(orders);
         console.log("object server connected to all orders");
       });
 ////////////////////////////////////////////////////////////////////// 
@@ -112,7 +112,7 @@ async function run() {
         const email = req.query.email;
         const query = {email: email}
         const result = await ordersCollection.find(query).toArray()
-        res.json(result);
+        res.send(result);
         console.log("connected to for single user");
       });
 //////////////////////////////////////////////////////////////////////
