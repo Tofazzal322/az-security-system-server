@@ -49,7 +49,39 @@ async function run() {
         res.send(products);
       });
 //////////////////////////////////////////////////////////////////////////
+
+      /////////////   Status  update API //////////////////////////////
+      app.put("/orders/:id", async (req, res) => {
+        const id = req.params.id;
+        const updateOrdersStatus = req.body;
+        const query = { _id: ObjectId(id) };
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: {
+            name: updateOrdersStatus.name,
+            status: updateOrdersStatus.status,
+            email: updateOrdersStatus.email,
+          },
+        };
+        const result = await ordersCollection.updateOne(
+          query,
+          updateDoc,
+          options
+        );
+        res.json(result);
+        console.log("Update Orders hitted");
+      });
+/////////////////////////////////////////////////////////////////// 
       
+///////////////////// All Orders collection for admin /////////////////////
+      app.get("/orders", async (req, res) => {
+       const cursor = ordersCollection.find({});
+        const orders = await cursor.toArray();
+        res.json(orders);
+        console.log("object server connected to all orders");
+      });
+////////////////////////////////////////////////////////////////////// 
+
 
 ////////////////////// GET Single Product by Id  /////////////////////////
       app.get("/products/:productId", async (req, res) => {
@@ -72,8 +104,9 @@ async function run() {
 
       
 ////////////////// GET Single product  /////////////////////////////////
-      app.get("/orders/:bookId", async (req, res) => {
-        const id = req.params.bookId;
+      
+      app.get("/orders/:orderId", async (req, res) => {
+        const id = req.params.orderId;
         console.log("getting specific product for update", id);
         const query = { _id: ObjectId(id) };
         const orders = await ordersCollection.findOne(query);
@@ -89,19 +122,12 @@ async function run() {
         const query = {email: email,date:date}
         const cursor = productsCollection.find(query);
         const products = await cursor.toArray()
-        res.send(products);
+        res.json(products);
       })
 /////////////////////////////////////////////////////////////////////////////
       
 
- ///////////////////// All Orders collection for admin /////////////////////
-      app.get("/orders", async (req, res) => {
-       const cursor = ordersCollection.find({});
-        const orders = await cursor.toArray();
-        res.send(orders);
-        console.log("object server connected to all orders");
-      });
-////////////////////////////////////////////////////////////////////// 
+ 
       
 
 
@@ -153,26 +179,7 @@ async function run() {
 
       
 
-/////////////   Status  update API //////////////////////////////
-      app.put("/orders/:ordersId", async (req, res) => {
-        const id = req.params.ordersId;
-        const updateOrdersStatus = req.body;
-        const query = { _id: ObjectId(id) };
-        const options = { upsert: true };
-        const updateDoc = {
-          $set: {
-            status: updateOrdersStatus.status,
-            email: updateOrdersStatus.email,
-          },
-        };
-        const result = await ordersCollection.updateOne(
-          query,
-          updateDoc,
-          options
-        );
-        res.json(result);
-      });
-///////////////////////////////////////////////////////////////////      
+     
       
 
 
