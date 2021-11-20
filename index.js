@@ -5,6 +5,7 @@ const admin = require("firebase-admin");
 require("dotenv").config();//dotenv config
 const port = process.env.PORT || 5000;
 const ObjectId = require('mongodb').ObjectId;
+const fileUpload = require('express-fileupload');
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
@@ -12,6 +13,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 //Middleware
 app.use(cors());
 app.use(express.json());
+app.use(fileUpload());
 
 //////////////////////////// Mongodb Server Uri and Client ////////////////////////////
 const { MongoClient } = require('mongodb');
@@ -49,7 +51,7 @@ async function run() {
       app.get("/products", async (req, res) => {
         const cursor = productsCollection.find({});
         const products = await cursor.toArray();
-        res.send(products);
+        res.json(products);
       });
 //////////////////////////////////////////////////////////////////////////
 
@@ -170,10 +172,32 @@ async function run() {
 
 /////////////// Post Products Data To database Api ////////////////
       app.post('/products', async (req, res) => {
-        const productsData = req.body
-        const result = await productsCollection.insertOne(productsData)
+        console.log(req.body);
+        console.log(req.files);
+        const name = req.body.name;
+        const price = req.body.price;
+        const model = req.body.model;
+        const state = req.body.status;
+        const productId = req.body.productId;
+        const date = req.body.date;
+        const description = req.body.description;
+        const picData = req.files.imageAdd;
+        const picture = picData.data;
+        const encodePic = picture.toString('base64');
+        const imageBuffer = Buffer.from(encodePic, 'base64');
+        const products = {
+          name,
+          price,
+          description,
+          model,
+          state,
+          date,
+          productId,
+          imageAdd:imageBuffer
+        }
+        const result = await productsCollection.insertOne(products)
              res.json(result)
-             console.log("data connected from add products")
+            
       })     
 ////////////////////////////////////////////////////////////////////
       
